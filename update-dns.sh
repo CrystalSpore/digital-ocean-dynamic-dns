@@ -22,9 +22,11 @@ check_credentials() {
 
 # Check credentials before proceeding
 check_credentials
-
-
-public_ip=$(curl -s http://checkip.amazonaws.com/)
+if [[ "${IP_SERVICE}" == "AWS" ]]; then
+  public_ip=$(curl -s http://checkip.amazonaws.com/)
+elif [[ "${IP_SERVICE}" == "IPINFO" ]]; then
+  public_ip=$(curl -s http://ipinfo.io/ip)
+fi
 
 for ID in "${RECORD_IDS[@]}"; do
   curl_response=$(
@@ -50,12 +52,15 @@ for ID in "${RECORD_IDS[@]}"; do
       jq -r '.domain_record.data'
     )
   fi
-  
+
   # if the IPs are the same just exit
+
   if [ "$local_ip" == "$public_ip" ]; then
     echo "IP has not changed for record ${ID}, skipping."
     continue
   fi
+
+  echo "Updating DNS with new IP address: ${public_ip} - IP address was: ${local_ip}"
 
   echo "Updating DNS record ${ID} with new IP address: ${public_ip}"
   # --fail silently on server errors
