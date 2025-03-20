@@ -54,15 +54,12 @@ for ID in "${RECORD_IDS[@]}"; do
   fi
 
   # if the IPs are the same just exit
-
   if [ "$local_ip" == "$public_ip" ]; then
     echo "IP has not changed for record ${ID}, skipping."
     continue
   fi
 
-  echo "Updating DNS with new IP address: ${public_ip} - IP address was: ${local_ip}"
-
-  echo "Updating DNS record ${ID} with new IP address: ${public_ip}"
+  echo "Updating DNS record ${ID} with new IP address: ${public_ip} - IP address was: ${local_ip}"
   # --fail silently on server errors
   curl \
     --fail \
